@@ -21,10 +21,10 @@ class Commodity(_base):
     def __init__(self, raw):
         super().__init__(raw)
         self.name = raw['commodityInfo']
-        self.native_unit = raw['nativeUseUnit']
-        self.common_unit = raw['commonUseUnit']
-        self.global_unit = raw['globalUseUnit']
-        self.global_square_foot_unit = raw['globalSqftUseUnit']
+        self.native_use_unit = raw['nativeUseUnit']
+        self.common_use_unit = raw['commonUseUnit']
+        self.global_use_unit = raw['globalUseUnit']
+        self.global_square_foot_use_unit = raw['globalSqftUseUnit']
 
 
 class Report(_base):
