@@ -121,5 +121,5 @@ class YaleEnergyData:
                 commodities[entry['commodityInfo']] = Commodity(entry)
             commodities[entry['commodityInfo']].reports.append(Report(entry))
         for commodity in commodities:
-            setattr(building, commodity, commodities[commodity])
+            setattr(building, commodity.lower(), commodities[commodity])
         return building
