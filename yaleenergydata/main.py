@@ -56,18 +56,26 @@ class YaleEnergyData:
         :param params: dictionary of custom params to add to request.
         """
         params['apikey'] = self.api_key
+        print(params)
         request = requests.get(self.API_TARGET, params=params)
         if request.ok:
-            return request.json()
+            return request.json()['ServiceResponse']
         else:
             # TODO: Can we be more helpful?
             raise Exception('API request failed.')
+
+    def dateify(self, date) -> datetime.date:
+        """
+        Convert any supported input format into a datetime.date.
+        """
 
     def stringify_date(self, date) -> str:
         """
         Convert a datetime object to a string in the approved format if necessary.
         """
-        if date.count('-') < 2:
+        if type(date) == tuple:
+            date = '%d-%d-01' % date
+        elif type(date) == str and date.count('-') < 2:
             # Assume that only a year/date combo has been provided
             date += '-01'
         elif type(date) in (datetime.datetime, datetime.date):
@@ -79,16 +87,19 @@ class YaleEnergyData:
         Generate a request to the API and fetch data within a given date range.
 
         :param building_id: ID of building to get data on. You may wish to use Yale's Building API to find an ID.
-        :param start_date: date to start sampling from. Can be a string or datetime/date object.
+        :param start_date: date to start sampling from. Can be a string or datetime/date object, or year/month tuple.
         :param end_date: date to end sampling at. Formatting is the same as start_date. If not specified, today.
         """
         start_date = self.stringify_date(start_date)
-        end_date = self.stringify_date(end_date or datetime.date.today())
+        if end_date is None:
+            end_date = datetime.date.today()
+        end_date = self.stringify_date(end_date)
         raw = self.get({
             'buildingID': building_id,
             'rangeStart': start_date,
             'rangeEnd': end_date,
         })
+        print(raw)
         if not raw:
             return None
         commodities = {}
