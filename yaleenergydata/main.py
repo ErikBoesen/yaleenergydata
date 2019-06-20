@@ -21,13 +21,24 @@ class Commodity(_base):
     def __init__(self, raw):
         super().__init__(raw)
         self.name = raw['commodityInfo']
+        self.native_unit = raw['nativeUseUnit']
+        self.common_unit = raw['commonUseUnit']
+        self.global_unit = raw['globalUseUnit']
+        self.global_square_foot_unit = raw['globalSqftUseUnit']
 
 
 class Report(_base):
-    def parse_date(self, raw: str) -> datetime.date()
+    def parse_date(self, raw: str):
+        year, month = raw.strip('-01 00:00:00.0').split('-')
+        return int(year), int(month)
+
     def __init__(self, raw):
         super().__init__(raw)
-        date = raw['usageMonth']
+        self.year, self.month = self.parse_date(raw['usageMonth'])
+        self.native_use = float(raw['nativeUse'])
+        self.common_use = float(raw['commonUse'])
+        self.global_use = float(raw['globalUse'])
+        self.global_square_foot_use = float(raw['globalSqftUse'])
 
 
 class YaleEnergyData:
