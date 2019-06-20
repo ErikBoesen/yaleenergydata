@@ -20,6 +20,7 @@ class Building(_base):
 class Commodity(_base):
     def __init__(self, raw):
         super().__init__(raw)
+        self.reports = []
         self.name = raw['commodityInfo']
         self.native_use_unit = raw['nativeUseUnit']
         self.common_use_unit = raw['commonUseUnit']
@@ -39,6 +40,7 @@ class Report(_base):
         self.common_use = float(raw['commonUse'])
         self.global_use = float(raw['globalUse'])
         self.global_square_foot_use = float(raw['globalSqftUse'])
+        self.row_id = int(raw['rowid'])
 
 
 class YaleEnergyData:
@@ -89,15 +91,10 @@ class YaleEnergyData:
             return None
         commodities = {}
         building = Building(raw[0])
-        """
         for entry in raw:
-            report = Report(entry)
-            if commodities.get() is None:
-                days[date] = {}
-            days[date][meal_code].items.append(item)
-        meals = []
-        for day in days:
-            for meal in days[day]:
-                meals.append(days[day][meal])
-        """
+            if entry['commodityInfo'] not in commodities:
+                commodities[entry['commodityInfo'] = Commodity(entry)
+            commodities[entry['commodityInfo']].reports.append(Report(entry))
+        for commodity in commodities:
+            setattr(building, commodity, commodities[commodity])
         return building
