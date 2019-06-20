@@ -53,7 +53,6 @@ class YaleEnergyData:
         """
         Make a GET request to the API.
 
-        :param endpoint: path to resource desired.
         :param params: dictionary of custom params to add to request.
         """
         params['apikey'] = self.api_key
@@ -68,7 +67,10 @@ class YaleEnergyData:
         """
         Convert a datetime object to a string in the approved format if necessary.
         """
-        if type(date) in (datetime.datetime, datetime.date):
+        if date.count('-') < 2:
+            # Assume that only a year/date combo has been provided
+            date += '-01'
+        elif type(date) in (datetime.datetime, datetime.date):
             date = date.strftime('%Y-%m-%d')
         return date
 
@@ -80,8 +82,8 @@ class YaleEnergyData:
         :param start_date: date to start sampling from. Can be a string or datetime/date object.
         :param end_date: date to end sampling at. Formatting is the same as start_date. If not specified, today.
         """
-        start_date = stringify_date(start_date)
-        end_date = stringify_date(end_date || datetime.date.today())
+        start_date = self.stringify_date(start_date)
+        end_date = self.stringify_date(end_date or datetime.date.today())
         raw = self.get({
             'buildingID': building_id,
             'rangeStart': start_date,
@@ -93,7 +95,7 @@ class YaleEnergyData:
         building = Building(raw[0])
         for entry in raw:
             if entry['commodityInfo'] not in commodities:
-                commodities[entry['commodityInfo'] = Commodity(entry)
+                commodities[entry['commodityInfo']] = Commodity(entry)
             commodities[entry['commodityInfo']].reports.append(Report(entry))
         for commodity in commodities:
             setattr(building, commodity, commodities[commodity])
