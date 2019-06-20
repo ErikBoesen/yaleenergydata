@@ -1,5 +1,5 @@
 import requests
-import date
+import datetime
 
 
 class _base:
@@ -10,17 +10,24 @@ class _base:
 class Building(_base):
     def __init__(self, raw):
         super().__init__(raw)
-
+        self.campus = raw['campus']
+        self.utility_area = raw['utilityArea']
+        self.id = raw['facid']
+        self.name = raw['buildingName']
+        self.square_footage = raw['SQR_FEET']
 
 
 class Commodity(_base):
     def __init__(self, raw):
         super().__init__(raw)
+        self.name = raw['commodityInfo']
 
 
 class Report(_base):
+    def parse_date(self, raw: str) -> datetime.date()
     def __init__(self, raw):
         super().__init__(raw)
+        date = raw['usageMonth']
 
 
 class YaleEnergyData:
