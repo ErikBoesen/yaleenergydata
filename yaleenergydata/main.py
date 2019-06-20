@@ -38,6 +38,7 @@ class Report(_base):
         self.year, self.month = self.parse_date(raw['usageMonth'])
         self.native_use = float(raw['nativeUse'])
         self.common_use = float(raw['commonUse'])
+        print(raw['globalUse'])
         self.global_use = float(raw['globalUse'])
         self.global_square_foot_use = float(raw['globalSqftUse'])
         self.row_id = int(raw['rowid'])
@@ -68,19 +69,23 @@ class YaleEnergyData:
         """
         Convert any supported input format into a datetime.date.
         """
+        if type(date) == datetime.date:
+            return date
+        elif type(date) == datetime.datetime:
+            return date.date()
+        elif type(date) == tuple:
+            year, month = date
+        elif type(date) == str:
+            year, month = date.split('-')[:2]
+            year = int(year)
+            month = int(month)
+        return datetime.date(year=year, month=month, day=1)
 
-    def stringify_date(self, date) -> str:
+    def stringify_date(self, date: datetime.date) -> str:
         """
         Convert a datetime object to a string in the approved format if necessary.
         """
-        if type(date) == tuple:
-            date = '%d-%d-01' % date
-        elif type(date) == str and date.count('-') < 2:
-            # Assume that only a year/date combo has been provided
-            date += '-01'
-        elif type(date) in (datetime.datetime, datetime.date):
-            date = date.strftime('%Y-%m-%d')
-        return date
+        return date.strftime('%Y-%m-%d')
 
     def building(self, building_id: str, start_date, end_date=None) -> Building:
         """
@@ -90,16 +95,16 @@ class YaleEnergyData:
         :param start_date: date to start sampling from. Can be a string or datetime/date object, or year/month tuple.
         :param end_date: date to end sampling at. Formatting is the same as start_date. If not specified, today.
         """
-        start_date = self.stringify_date(start_date)
+        start_date = self.dateify(start_date)
         if end_date is None:
-            end_date = datetime.date.today()
-        end_date = self.stringify_date(end_date)
+            end_date = start_date + datetime.timedelta(1 * 365 / 12)
+        end_date = self.dateify(end_date)
         raw = self.get({
             'buildingID': building_id,
-            'rangeStart': start_date,
-            'rangeEnd': end_date,
+            'rangeStart': self.stringify_date(start_date),
+            'rangeEnd': self.stringify_date(end_date),
         })
-        print(raw)
+        from pprint import pprint
         if not raw:
             return None
         commodities = {}
