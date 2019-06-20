@@ -2,9 +2,25 @@ import requests
 import date
 
 
-class Building:
+class _base:
     def __init__(self, raw):
+        self.raw = raw
 
+
+class Building(_base):
+    def __init__(self, raw):
+        super().__init__(raw)
+
+
+
+class Commodity(_base):
+    def __init__(self, raw):
+        super().__init__(raw)
+
+
+class Report(_base):
+    def __init__(self, raw):
+        super().__init__(raw)
 
 
 class YaleEnergyData:
@@ -36,9 +52,9 @@ class YaleEnergyData:
             date = date.strftime('%Y-%m-%d')
         return date
 
-    def fetch(self, building_id: str, start_date, end_date=None):
+    def building(self, building_id: str, start_date, end_date=None) -> Building:
         """
-        Build a request to the API and fetch data within a given date range.
+        Generate a request to the API and fetch data within a given date range.
 
         :param building_id: ID of building to get data on. You may wish to use Yale's Building API to find an ID.
         :param start_date: date to start sampling from. Can be a string or datetime/date object.
@@ -51,18 +67,19 @@ class YaleEnergyData:
             'rangeStart': start_date,
             'rangeEnd': end_date,
         })
-        days = {}
-        for raw_item in raw:
-            date = raw_item['MENUDATE']
-            meal_code = raw_item['MEALCODE']
-            item = Item(raw_item, self)
-            if days.get(date) is None:
+        if not raw:
+            return None
+        commodities = {}
+        building = Building(raw[0])
+        """
+        for entry in raw:
+            report = Report(entry)
+            if commodities.get() is None:
                 days[date] = {}
-            if days[date].get(meal_code) is None:
-                days[date][meal_code] = Meal(raw_item, self)
             days[date][meal_code].items.append(item)
         meals = []
         for day in days:
             for meal in days[day]:
                 meals.append(days[day][meal])
-        return meals
+        """
+        return building
