@@ -29,18 +29,26 @@ class Commodity(_base):
 
 
 class Report(_base):
-    def parse_date(self, raw: str):
+    def _parse_date(self, raw: str):
         year, month = raw.strip('-01 00:00:00.0').split('-')
         return int(year), int(month)
 
+    def _parse_use(self, raw):
+        """
+        Sometimes use will inexplicably be an empty array. Correct for that.
+        """
+        if raw == []:
+            return None
+        else:
+            return float(raw)
+
     def __init__(self, raw):
         super().__init__(raw)
-        self.year, self.month = self.parse_date(raw['usageMonth'])
-        self.native_use = float(raw['nativeUse'])
-        self.common_use = float(raw['commonUse'])
-        print(raw['globalUse'])
-        self.global_use = float(raw['globalUse'])
-        self.global_square_foot_use = float(raw['globalSqftUse'])
+        self.year, self.month = self._parse_date(raw['usageMonth'])
+        self.native_use = self._parse_use(raw['nativeUse'])
+        self.common_use = self._parse_use(raw['commonUse'])
+        self.global_use = self._parse_use(raw['globalUse'])
+        self.global_square_foot_use = self._parse_use(raw['globalSqftUse'])
         self.row_id = int(raw['rowid'])
 
 
@@ -104,7 +112,6 @@ class YaleEnergyData:
             'rangeStart': self.stringify_date(start_date),
             'rangeEnd': self.stringify_date(end_date),
         })
-        from pprint import pprint
         if not raw:
             return None
         commodities = {}
