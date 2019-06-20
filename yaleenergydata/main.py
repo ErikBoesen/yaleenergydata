@@ -30,7 +30,7 @@ class Commodity(_base):
 
 class Report(_base):
     def _parse_date(self, raw: str):
-        year, month = raw.strip('-01 00:00:00.0').split('-')
+        year, month = raw[:len(raw)-len('-01 00:00:00.0')].split('-')
         return int(year), int(month)
 
     def _parse_use(self, raw):
@@ -71,7 +71,7 @@ class YaleEnergyData:
             return request.json()['ServiceResponse']
         else:
             # TODO: Can we be more helpful?
-            raise Exception('API request failed.')
+            raise Exception('API request failed. Data returned: ' + request.text)
 
     def dateify(self, date) -> datetime.date:
         """
@@ -108,7 +108,7 @@ class YaleEnergyData:
             end_date = start_date + datetime.timedelta(1 * 365 / 12)
         end_date = self.dateify(end_date)
         raw = self.get({
-            'buildingID': building_id,
+            'buildingID': str(building_id),
             'rangeStart': self.stringify_date(start_date),
             'rangeEnd': self.stringify_date(end_date),
         })
