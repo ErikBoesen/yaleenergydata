@@ -9,5 +9,5 @@ setup(name='yaleenergydata',
       author='Erik Boesen',
       author_email='me@erikboesen.com',
       license='GPL',
-      packages=['yaledining'],
+      packages=['yaleenergydata'],
       install_requires=['requests'])
